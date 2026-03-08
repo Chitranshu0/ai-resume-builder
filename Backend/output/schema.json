@@ -23,13 +23,6 @@
     "tools": []
   },
   "certifications": [],
-  "projects": [
-    {
-      "name": "",
-      "description": "",
-      "technologies": []
-    }
-  ],
   "internships": [
     {
       "company": "",
@@ -37,6 +30,20 @@
       "description": ""
     }
   ],
+  "projects": {
+  "project1": {
+    "name": "",
+    "description": "",
+    "technologies": [],
+    "github_link": ""
+  },
+  "project2": {
+    "name": "",
+    "description": "",
+    "technologies": [],
+    "github_link": ""
+  }
+},
   "achievements": [],
   "positions_of_responsibility": [],
   "research_work": [],

@@ -3,81 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Loader</title>
+    <title>Resume Builder Parser</title>
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <main class="page">
-        <section class="panel">
-            <p class="eyebrow">Document Loader</p>
-            <h1>Upload PDF or Word files</h1>
+    <main class="layout">
+        <section class="hero">
+            <p class="eyebrow">Resume Intelligence Pipeline</p>
+            <h1>Upload a resume and get structured JSON instantly</h1>
             <p class="intro">
-                Choose a `.pdf`, `.doc`, or `.docx` file and store it in the backend `pdf` folder.
+                This frontend is connected to the FastAPI backend. It uploads a resume, runs your LangChain plus RAG extraction flow, validates the response against the schema, and stores the final JSON output.
             </p>
 
-            <form id="uploadForm" class="upload-form">
-                <label for="document" class="file-label">Select document</label>
-                <input id="document" name="document" type="file" accept=".pdf,.doc,.docx" required>
-                <button type="submit">Upload</button>
+            <form id="parseForm" class="upload-card">
+                <label for="document" class="file-label">Choose a resume file</label>
+                <input id="document" name="document" type="file" accept=".pdf,.docx" required>
+                <div class="button-row">
+                    <button type="submit">Parse Resume</button>
+                    <button id="refreshButton" type="button" class="secondary">Refresh Files</button>
+                </div>
             </form>
 
             <p id="status" class="status" aria-live="polite"></p>
+        </section>
 
-            <section class="list-block">
-                <div class="list-header">
-                    <h2>Stored documents</h2>
-                    <button id="refreshButton" type="button" class="secondary">Refresh</button>
+        <section class="content-grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <h2>Saved resumes</h2>
+                    <span class="pill">Backend/pdf</span>
                 </div>
-                <ul id="documentList" class="document-list"></ul>
-            </section>
+                <ul id="documentList" class="item-list"></ul>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <h2>Generated JSON files</h2>
+                    <span class="pill">Backend/output</span>
+                </div>
+                <ul id="outputList" class="item-list"></ul>
+            </article>
+        </section>
+
+        <section class="result-panel">
+            <div class="panel-header">
+                <h2>Structured result</h2>
+                <button id="downloadButton" type="button" class="secondary" disabled>Download JSON</button>
+            </div>
+            <pre id="jsonOutput" class="json-view">Upload a resume to see the parsed JSON here.</pre>
         </section>
     </main>
 
     <script>
-        const apiBaseUrl = "http://127.0.0.1:8000";
-        const uploadForm = document.getElementById("uploadForm");
+        const apiBaseUrl = window.location.origin;
+        const parseForm = document.getElementById("parseForm");
         const documentInput = document.getElementById("document");
         const statusText = document.getElementById("status");
         const documentList = document.getElementById("documentList");
+        const outputList = document.getElementById("outputList");
+        const jsonOutput = document.getElementById("jsonOutput");
         const refreshButton = document.getElementById("refreshButton");
+        const downloadButton = document.getElementById("downloadButton");
 
-        async function loadDocuments() {
-            documentList.innerHTML = "<li class='placeholder'>Loading documents...</li>";
+        let latestResult = null;
+        let latestFilename = "resume_structured.json";
+
+        function renderList(target, items, emptyMessage) {
+            if (!items.length) {
+                target.innerHTML = `<li class="placeholder">${emptyMessage}</li>`;
+                return;
+            }
+
+            target.innerHTML = items
+                .map(
+                    (item) => `
+                        <li>
+                            <span>${item.name}</span>
+                            <strong>${(item.size / 1024).toFixed(1)} KB</strong>
+                        </li>
+                    `
+                )
+                .join("");
+        }
+
+        async function loadFiles() {
+            documentList.innerHTML = "<li class='placeholder'>Loading uploaded resumes...</li>";
+            outputList.innerHTML = "<li class='placeholder'>Loading generated JSON files...</li>";
 
             try {
-                const response = await fetch(`${apiBaseUrl}/documents`);
-                const data = await response.json();
+                const [documentsResponse, outputsResponse] = await Promise.all([
+                    fetch(`${apiBaseUrl}/documents`),
+                    fetch(`${apiBaseUrl}/outputs`)
+                ]);
 
-                if (!response.ok) {
-                    throw new Error(data.detail || "Unable to fetch documents.");
+                const documentsData = await documentsResponse.json();
+                const outputsData = await outputsResponse.json();
+
+                if (!documentsResponse.ok) {
+                    throw new Error(documentsData.detail || "Unable to load uploaded resumes.");
                 }
 
-                if (!data.documents.length) {
-                    documentList.innerHTML = "<li class='placeholder'>No files uploaded yet.</li>";
-                    return;
+                if (!outputsResponse.ok) {
+                    throw new Error(outputsData.detail || "Unable to load generated JSON files.");
                 }
 
-                documentList.innerHTML = data.documents
-                    .map(
-                        (file) => `
-                            <li>
-                                <span>${file.name}</span>
-                                <strong>${(file.size / 1024).toFixed(1)} KB</strong>
-                            </li>
-                        `
-                    )
-                    .join("");
+                renderList(documentList, documentsData.documents, "No resumes uploaded yet.");
+                renderList(outputList, outputsData.outputs, "No JSON output generated yet.");
             } catch (error) {
                 documentList.innerHTML = `<li class="placeholder error">${error.message}</li>`;
+                outputList.innerHTML = `<li class="placeholder error">${error.message}</li>`;
             }
         }
 
-        uploadForm.addEventListener("submit", async (event) => {
+        function setResult(data, filename) {
+            latestResult = data;
+            latestFilename = filename;
+            jsonOutput.textContent = JSON.stringify(data, null, 2);
+            downloadButton.disabled = false;
+        }
+
+        parseForm.addEventListener("submit", async (event) => {
             event.preventDefault();
 
             const selectedFile = documentInput.files[0];
             if (!selectedFile) {
-                statusText.textContent = "Please choose a file first.";
+                statusText.textContent = "Please choose a resume file first.";
                 statusText.className = "status error";
                 return;
             }
@@ -85,33 +135,50 @@
             const formData = new FormData();
             formData.append("file", selectedFile);
 
-            statusText.textContent = "Uploading document...";
+            statusText.textContent = "Uploading and parsing resume...";
             statusText.className = "status";
+            jsonOutput.textContent = "Processing resume through extraction pipeline...";
+            downloadButton.disabled = true;
 
             try {
-                const response = await fetch(`${apiBaseUrl}/upload`, {
+                const response = await fetch(`${apiBaseUrl}/parse-resume`, {
                     method: "POST",
                     body: formData
                 });
 
                 const data = await response.json();
-
                 if (!response.ok) {
-                    throw new Error(data.detail || "Upload failed.");
+                    throw new Error(data.detail || "Resume parsing failed.");
                 }
 
-                statusText.textContent = `${data.filename} uploaded successfully.`;
+                statusText.textContent = `${data.filename} parsed successfully. JSON saved as ${data.output_file}.`;
                 statusText.className = "status success";
-                uploadForm.reset();
-                loadDocuments();
+                setResult(data.data, data.output_file);
+                parseForm.reset();
+                loadFiles();
             } catch (error) {
                 statusText.textContent = error.message;
                 statusText.className = "status error";
+                jsonOutput.textContent = "Parsing failed. Check backend dependencies, API key configuration, and file readability.";
             }
         });
 
-        refreshButton.addEventListener("click", loadDocuments);
-        loadDocuments();
+        downloadButton.addEventListener("click", () => {
+            if (!latestResult) {
+                return;
+            }
+
+            const blob = new Blob([JSON.stringify(latestResult, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            anchor.download = latestFilename;
+            anchor.click();
+            URL.revokeObjectURL(url);
+        });
+
+        refreshButton.addEventListener("click", loadFiles);
+        loadFiles();
     </script>
 </body>
 </html>

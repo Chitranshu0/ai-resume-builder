@@ -1,0 +1,142 @@
+{
+  "personal_info": {
+    "name": "CHITRANSHU SANKET",
+    "email": "23cseds037.chitranshusanket@giet.edu",
+    "phone": "+91-7088153650",
+    "linkedin": "https://www.linkedin.com/in/chitranshu-sanket/",
+    "github": ""
+  },
+  "career_objective": "I’m a Computer Science student specializing in Data Science who enjoys solving problems through data-driven thinking and AI. I work with Python and Machine Learning, while exploring Generative AI and building small-scale agentic AI projects using RAG systems. As an active chess player, I naturally approach challenges with strategic thinking, pattern recognition, and analytical decision-making. I also enjoy sharing knowledge and mentoring, having conducted workshops and supported hackathons through the Google Developer Group (GDG) and other technical communities, while continuously learning and building practical AI solutions with real-world impact.",
+  "education": [
+    {
+      "degree": "B. Tech (Computer Science and Engineering [Data Science])",
+      "year": "2023-27",
+      "institute": "Gandhi Institute of Engineering and Technology University, Gunupur, Odisha",
+      "board": "GIET UNIVERSITY",
+      "score": "7.11"
+    },
+    {
+      "degree": "+2 Science in 2023",
+      "year": "",
+      "institute": "KINGCUP PUBLIC SCHOOL | ITANAGAR, ARUNACHAL PRADESH",
+      "board": "CBSE",
+      "score": "57%"
+    },
+    {
+      "degree": "10th in 2021",
+      "year": "",
+      "institute": "INSPIRATION PUBLIC SCHOOL | HALDWANI, UTTRAKHAND",
+      "board": "CBSE",
+      "score": "60%"
+    }
+  ],
+  "skills": {
+    "programming_languages": [
+      "Python",
+      "R",
+      "C/C++",
+      "Java",
+      "HTML/CSS",
+      "JavaScript",
+      "SQL"
+    ],
+    "databases": [
+      "RDBMS: MySQL, PostgreSQL",
+      "Non-RDBMS: MongoDB, VectorDB: Chroma, FAISS"
+    ],
+    "libraries_frameworks": [
+      "Pandas",
+      "NumPy",
+      "Matplotlib",
+      "Seaborn",
+      "Scikit-Learn",
+      "Xgboost",
+      "PyTorch",
+      "Tensorflow",
+      "Keras",
+      "Optuna",
+      "Flask",
+      "FastAPI",
+      "Pydantic",
+      "LangChain",
+      "LangGraph"
+    ],
+    "tools": [
+      "Excel",
+      "Power BI",
+      "Bash",
+      "Shell",
+      "Git/GitHub",
+      "Docker",
+      "Jupyter notebook",
+      "VS code",
+      "PyCharm",
+      "Cursor",
+      "Antigravity",
+      "SQL workbench",
+      "PgAdmin"
+    ]
+  },
+  "certifications": [
+    "OCI AI Foundation & Data Science (Oracle)",
+    "R programming & Programming in Modern C++ (NPTEL)",
+    "Introduction to Data Science (Cisco)",
+    "Data Science & Analytics (HP Life)",
+    "Machine Learning for Data Science (IBM)",
+    "Generative AI Fundamentals (Databrick)",
+    "RAG with MongoDB (MongoDB University)",
+    "Project Management (Udemy)",
+    "Job Simulation: 1. Quantitative Research (JP Morgon) via Forage, 2. Data Analytics & Visualization (Accenture) via Forage"
+  ],
+  "internships": [
+    {
+      "company": "Bisy Hub",
+      "role": "AI/Tech Project Manager Intern",
+      "description": "Developed a FastAPI dashboard with Pydantic-based validation and user authentication on Render, automating social content workflows and saving 10+ hours weekly. Built pipelines integrating 10+ data sources including Gemini, Hugging Face, Google Sheets, Supabase, PostgreSQL, and APIs to auto-generate captions and optimize media assets Engineered API-driven workflows using n8n and Cloudinary, scaling content publishing from 0 to 100+ posts per week, enabling end-to-end automation."
+    }
+  ],
+  "projects": {
+    "project1": {
+      "name": "CampusGPT – AI-Powered Academic Assistant",
+      "description": "Built a RAG-based academic assistant using FastAPI and FAISS to answer exam-related queries from lecture notes and past papers. Developed OCR pipeline with Tesseract to extract structured knowledge from lecture slides. Implemented semantic retrieval and question prediction using historical exam pattern analysis.",
+      "technologies": [
+        "Frontend: HTML/CSS",
+        "Backend: Python (FastAPI, Pydantic, typing, Langchain, LangGraph, OCR: Tesseract)",
+        "Database: FAISS"
+      ],
+      "github_link": ""
+    },
+    "project2": {
+      "name": "AI-Powered Medical Image Tumor Detection",
+      "description": "Developed a CNN-based tumor detection model using PyTorch (ResNet/EfficientNet) for medical image classification, achieving 97% accuracy, with regularization techniques like Dropout and Early Stopping to reduce overfitting. Applied Optuna for hyperparameter tuning, optimizing learning rate, batch size, and model architecture to improve training performance and model generalization. Implemented Grad-CAM explainability to visualize important regions in medical images, highlighting tumor areas and improving interpretability of deep learning predictions.",
+      "technologies": [
+        "Backend: Python",
+        "Deep Learning: CNN (ResNet / EfficientNet), Grad-CAM Explainability",
+        "Libraries: Pandas, Numpy, Matplotlib, Scikit-learn, PyTorch, Tensorflow, Optuna"
+      ],
+      "github_link": ""
+    }
+  },
+  "achievements": [
+    "Secured mainly 1st and 2nd positions on University Chess tournaments.",
+    "90+ Questions on Leetcode.",
+    "Secured 1st position on Eureka hosted by PDCS club about personality & communication",
+    "Currently working on 3 Research Papers: Political Analysis: researching and working to improve Exit Poll decision through Twitter/X posts, by building a LSTM model, and currently experimenting with RAG & AI Rate of increase in type 2 Diabetes among youngster globally & developing countries Ultrasound Nerve Segmentation using U-Net model and improvement for developing best CNN architecture to for segmentation."
+  ],
+  "positions_of_responsibility": [
+    "Data Science Lead in Google Developer Group on Campus - Conducted hackathons: Tech-fest (January-2026), Marvels of Machine Learning (December-2025) Technically support other GDG events like Prompt to Prototype, Start-up Carnival (December-2025) Co-Lead recruitment for the Club specifically for AI/ML & Data Science domain.",
+    "Technical Head of Data Science Club (DSC) - Workshop: Mentored Students for SQL & Database Management System 101 Conducted events of Data Visualization & Data Science Quiz’s",
+    "Tech supporter and Mentor in the Student Association of Robotic Science (SARS) - Workshop: Mentored for the basic of IoT (2024) Co-Member recruitment for the Club for student who were interested & has a basic knowledge on IoT.",
+    "Technical Core member in AI/ML Club - Workshop: Mentored Students for fundamentals of Generative AI; Covered foundational topic like Machine Learning (type), Deep Learning (ANN, CNN, RNN, LSTM with a simple story), and talked about RAG and its applications.",
+    "An active Chess player and mentor in the University Chess Club - Secured mainly 1st and 2nd positions on University Chess tournaments. Represented College in many Inter-college Chess tournaments ex:-(OUTR, NIT RKL, VSSUT, IGIT) Mentored mates for chess competitions & Learning."
+  ],
+  "research_work": [],
+  "languages_known": [
+    "English",
+    "Hindi",
+    "Spanish(A2)"
+  ],
+  "interests": [
+    "Chess, Reading, Travelling, Exploring, connecting with people, Technology, Duolingo, watching F1, playing Table tennis."
+  ]
+}
