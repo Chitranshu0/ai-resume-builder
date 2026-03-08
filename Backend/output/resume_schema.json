@@ -1,0 +1,59 @@
+{
+  "personal_info": {
+    "name": "Chitranshu Sanket",
+    "email": "23cseds037.chitranshusanket@giet.edu",
+    "phone": "+91-7088153650",
+    "linkedin": "https://www.linkedin.com/in/chitranshu-sanket/",
+    "github": "https://github.com/Chitranshu0/Automate-post/"
+  },
+  "career_objective": "As a computer science student with a specialization in Data Science, I'm drawn to environments that foster analytical thinking, collaborative problem-solving, and innovation through AI. With expertise in Python, R, and machine learning, I seek to leverage my skills in data-driven decision-making, and Generative AI. Through mentorship, leadership roles in technical communities, and hands-on projects, I've developed strategic thinking, pattern recognition, and effective communication skills. I'm excited to join an organization where I can apply my skills, share knowledge, and contribute to meaningful projects that drive real-world impact.",
+  "education": [
+  {
+    "degree": "",
+    "year": "",
+    "institute_name": "",
+    "board_or_university": "",
+    "score_or_cgpa": ""
+  },
+  {
+    "degree": "",
+    "year": "",
+    "institute_name": "",
+    "board_or_university": "",
+    "score_or_cgpa": ""
+  },
+  {
+    "degree": "",
+    "year": "",
+    "institute_name": "",
+    "board_or_university": "",
+    "score_or_cgpa": ""
+  }
+],
+  "skills": {
+    "programming_languages": [],
+    "databases": [],
+    "libraries_frameworks": [],
+    "tools": []
+  },
+  "certifications": [],
+  "projects": [
+    {
+      "name": "",
+      "description": "",
+      "technologies": []
+    }
+  ],
+  "internships": [
+    {
+      "company": "",
+      "role": "",
+      "description": ""
+    }
+  ],
+  "achievements": [],
+  "positions_of_responsibility": [],
+  "research_work": [],
+  "languages_known": [],
+  "interests": []
+}

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Loader</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <main class="page">
+        <section class="panel">
+            <p class="eyebrow">Document Loader</p>
+            <h1>Upload PDF or Word files</h1>
+            <p class="intro">
+                Choose a `.pdf`, `.doc`, or `.docx` file and store it in the backend `pdf` folder.
+            </p>
+
+            <form id="uploadForm" class="upload-form">
+                <label for="document" class="file-label">Select document</label>
+                <input id="document" name="document" type="file" accept=".pdf,.doc,.docx" required>
+                <button type="submit">Upload</button>
+            </form>
+
+            <p id="status" class="status" aria-live="polite"></p>
+
+            <section class="list-block">
+                <div class="list-header">
+                    <h2>Stored documents</h2>
+                    <button id="refreshButton" type="button" class="secondary">Refresh</button>
+                </div>
+                <ul id="documentList" class="document-list"></ul>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const apiBaseUrl = "http://127.0.0.1:8000";
+        const uploadForm = document.getElementById("uploadForm");
+        const documentInput = document.getElementById("document");
+        const statusText = document.getElementById("status");
+        const documentList = document.getElementById("documentList");
+        const refreshButton = document.getElementById("refreshButton");
+
+        async function loadDocuments() {
+            documentList.innerHTML = "<li class='placeholder'>Loading documents...</li>";
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/documents`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || "Unable to fetch documents.");
+                }
+
+                if (!data.documents.length) {
+                    documentList.innerHTML = "<li class='placeholder'>No files uploaded yet.</li>";
+                    return;
+                }
+
+                documentList.innerHTML = data.documents
+                    .map(
+                        (file) => `
+                            <li>
+                                <span>${file.name}</span>
+                                <strong>${(file.size / 1024).toFixed(1)} KB</strong>
+                            </li>
+                        `
+                    )
+                    .join("");
+            } catch (error) {
+                documentList.innerHTML = `<li class="placeholder error">${error.message}</li>`;
+            }
+        }
+
+        uploadForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const selectedFile = documentInput.files[0];
+            if (!selectedFile) {
+                statusText.textContent = "Please choose a file first.";
+                statusText.className = "status error";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+
+            statusText.textContent = "Uploading document...";
+            statusText.className = "status";
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/upload`, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || "Upload failed.");
+                }
+
+                statusText.textContent = `${data.filename} uploaded successfully.`;
+                statusText.className = "status success";
+                uploadForm.reset();
+                loadDocuments();
+            } catch (error) {
+                statusText.textContent = error.message;
+                statusText.className = "status error";
+            }
+        });
+
+        refreshButton.addEventListener("click", loadDocuments);
+        loadDocuments();
+    </script>
+</body>
+</html>

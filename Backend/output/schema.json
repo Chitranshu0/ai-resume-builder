@@ -1,0 +1,45 @@
+{
+  "personal_info": {
+    "name": "",
+    "email": "",
+    "phone": "",
+    "linkedin": "",
+    "github": ""
+  },
+  "career_objective": "",
+  "education": [
+    {
+      "degree": "",
+      "year": "",
+      "institute": "",
+      "board": "",
+      "score": ""
+    }
+  ],
+  "skills": {
+    "programming_languages": [],
+    "databases": [],
+    "libraries_frameworks": [],
+    "tools": []
+  },
+  "certifications": [],
+  "projects": [
+    {
+      "name": "",
+      "description": "",
+      "technologies": []
+    }
+  ],
+  "internships": [
+    {
+      "company": "",
+      "role": "",
+      "description": ""
+    }
+  ],
+  "achievements": [],
+  "positions_of_responsibility": [],
+  "research_work": [],
+  "languages_known": [],
+  "interests": []
+}
