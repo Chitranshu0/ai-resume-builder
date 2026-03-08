@@ -24,6 +24,15 @@ def load_prompt_template() -> PromptTemplate:
     )
 
 
+def load_direct_prompt_template() -> PromptTemplate:
+    prompt_text = (PROMPT_DIR / "resume_extraction_prompt.txt").read_text(encoding="utf-8")
+    return PromptTemplate(
+        template=prompt_text,
+        input_variables=["context", "question"],
+        partial_variables={"schema": json.dumps(SCHEMA_TEMPLATE, indent=2)},
+    )
+
+
 def load_document(file_path: Path) -> list[Any]:
     if file_path.suffix.lower() == ".pdf":
         return PyMuPDFLoader(str(file_path)).load()
@@ -36,6 +45,11 @@ def split_documents(file_path: Path) -> list[Any]:
     documents = load_document(file_path)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=8000, chunk_overlap=1200)
     return text_splitter.split_documents(documents)
+
+
+def build_resume_context(file_path: Path) -> str:
+    documents = load_document(file_path)
+    return "\n\n".join(document.page_content for document in documents if document.page_content.strip())
 
 
 def build_llm() -> ChatGroq:
@@ -60,6 +74,19 @@ def extract_json_from_text(content: str) -> dict[str, Any]:
     if start == -1 or end == -1 or end <= start:
         raise RuntimeError("RAG response did not return a valid JSON object.")
     return json.loads(text[start : end + 1])
+
+
+def extract_resume_data_direct(file_path: Path) -> ResumeSchema:
+    llm = build_llm()
+    prompt = load_direct_prompt_template()
+    resume_context = build_resume_context(file_path)
+    query = (
+        "Extract only the information explicitly present in the resume text into the exact JSON schema. "
+        "Do not infer, rewrite, or enhance missing content. Keep career_objective empty if it is not clearly present."
+    )
+    response = llm.invoke(prompt.format(context=resume_context, question=query))
+    parsed_json = extract_json_from_text(response.content)
+    return ResumeSchema.model_validate(parsed_json)
 
 
 def extract_resume_data_with_rag(file_path: Path) -> ResumeSchema:
@@ -96,3 +123,12 @@ def extract_resume_data_with_rag(file_path: Path) -> ResumeSchema:
 
     parsed_json = extract_json_from_text(result["result"])
     return ResumeSchema.model_validate(parsed_json)
+
+
+def extract_both_resume_results(file_path: Path) -> dict[str, ResumeSchema]:
+    direct_result = extract_resume_data_direct(file_path)
+    rag_result = extract_resume_data_with_rag(file_path)
+    return {
+        "structured_result": direct_result,
+        "ai_powered_result": rag_result,
+    }

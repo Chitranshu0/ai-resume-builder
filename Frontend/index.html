@@ -20,37 +20,27 @@
                 <input id="document" name="document" type="file" accept=".pdf,.docx" required>
                 <div class="button-row">
                     <button type="submit">Parse Resume</button>
-                    <button id="refreshButton" type="button" class="secondary">Refresh Files</button>
                 </div>
             </form>
 
             <p id="status" class="status" aria-live="polite"></p>
         </section>
 
-        <section class="content-grid">
-            <article class="panel">
-                <div class="panel-header">
-                    <h2>Saved resumes</h2>
-                    <span class="pill">Backend/pdf</span>
-                </div>
-                <ul id="documentList" class="item-list"></ul>
-            </article>
-
-            <article class="panel">
-                <div class="panel-header">
-                    <h2>Generated JSON files</h2>
-                    <span class="pill">Backend/output</span>
-                </div>
-                <ul id="outputList" class="item-list"></ul>
-            </article>
-        </section>
-
         <section class="result-panel">
             <div class="panel-header">
-                <h2>Structured result</h2>
+                <h2>Structured results</h2>
                 <button id="downloadButton" type="button" class="secondary" disabled>Download JSON</button>
             </div>
-            <pre id="jsonOutput" class="json-view">Upload a resume to see the parsed JSON here.</pre>
+            <div class="result-grid">
+                <section class="result-card">
+                    <h3>Resume Structured Result</h3>
+                    <pre id="structuredOutput" class="json-view">Upload a resume to see the direct structured result here.</pre>
+                </section>
+                <section class="result-card">
+                    <h3>AI Powered Structured Result</h3>
+                    <pre id="aiOutput" class="json-view">Upload a resume to see the AI-powered RAG result here.</pre>
+                </section>
+            </div>
         </section>
     </main>
 
@@ -59,66 +49,34 @@
         const parseForm = document.getElementById("parseForm");
         const documentInput = document.getElementById("document");
         const statusText = document.getElementById("status");
-        const documentList = document.getElementById("documentList");
-        const outputList = document.getElementById("outputList");
-        const jsonOutput = document.getElementById("jsonOutput");
-        const refreshButton = document.getElementById("refreshButton");
+        const structuredOutput = document.getElementById("structuredOutput");
+        const aiOutput = document.getElementById("aiOutput");
         const downloadButton = document.getElementById("downloadButton");
 
         let latestResult = null;
         let latestFilename = "resume_structured.json";
+        let cleanupPending = false;
 
-        function renderList(target, items, emptyMessage) {
-            if (!items.length) {
-                target.innerHTML = `<li class="placeholder">${emptyMessage}</li>`;
+        async function cleanupServerFiles() {
+            if (!cleanupPending) {
                 return;
             }
 
-            target.innerHTML = items
-                .map(
-                    (item) => `
-                        <li>
-                            <span>${item.name}</span>
-                            <strong>${(item.size / 1024).toFixed(1)} KB</strong>
-                        </li>
-                    `
-                )
-                .join("");
-        }
-
-        async function loadFiles() {
-            documentList.innerHTML = "<li class='placeholder'>Loading uploaded resumes...</li>";
-            outputList.innerHTML = "<li class='placeholder'>Loading generated JSON files...</li>";
-
             try {
-                const [documentsResponse, outputsResponse] = await Promise.all([
-                    fetch(`${apiBaseUrl}/documents`),
-                    fetch(`${apiBaseUrl}/outputs`)
-                ]);
-
-                const documentsData = await documentsResponse.json();
-                const outputsData = await outputsResponse.json();
-
-                if (!documentsResponse.ok) {
-                    throw new Error(documentsData.detail || "Unable to load uploaded resumes.");
-                }
-
-                if (!outputsResponse.ok) {
-                    throw new Error(outputsData.detail || "Unable to load generated JSON files.");
-                }
-
-                renderList(documentList, documentsData.documents, "No resumes uploaded yet.");
-                renderList(outputList, outputsData.outputs, "No JSON output generated yet.");
+                await fetch(`${apiBaseUrl}/cleanup`, { method: "DELETE", keepalive: true });
             } catch (error) {
-                documentList.innerHTML = `<li class="placeholder error">${error.message}</li>`;
-                outputList.innerHTML = `<li class="placeholder error">${error.message}</li>`;
+                console.error("Cleanup failed", error);
+            } finally {
+                cleanupPending = false;
             }
         }
 
         function setResult(data, filename) {
             latestResult = data;
             latestFilename = filename;
-            jsonOutput.textContent = JSON.stringify(data, null, 2);
+            cleanupPending = true;
+            structuredOutput.textContent = JSON.stringify(data.structured_result, null, 2);
+            aiOutput.textContent = JSON.stringify(data.ai_powered_result, null, 2);
             downloadButton.disabled = false;
         }
 
@@ -137,7 +95,8 @@
 
             statusText.textContent = "Uploading and parsing resume...";
             statusText.className = "status";
-            jsonOutput.textContent = "Processing resume through extraction pipeline...";
+            structuredOutput.textContent = "Building direct structured result from the uploaded resume...";
+            aiOutput.textContent = "Running AI-powered RAG result generation...";
             downloadButton.disabled = true;
 
             try {
@@ -155,11 +114,11 @@
                 statusText.className = "status success";
                 setResult(data.data, data.output_file);
                 parseForm.reset();
-                loadFiles();
             } catch (error) {
                 statusText.textContent = error.message;
                 statusText.className = "status error";
-                jsonOutput.textContent = "Parsing failed. Check backend dependencies, API key configuration, and file readability.";
+                structuredOutput.textContent = "Parsing failed. Check backend dependencies, API key configuration, and file readability.";
+                aiOutput.textContent = "Parsing failed. Check backend dependencies, API key configuration, and file readability.";
             }
         });
 
@@ -175,10 +134,16 @@
             anchor.download = latestFilename;
             anchor.click();
             URL.revokeObjectURL(url);
+            cleanupServerFiles();
         });
 
-        refreshButton.addEventListener("click", loadFiles);
-        loadFiles();
+        window.addEventListener("pagehide", () => {
+            if (!cleanupPending) {
+                return;
+            }
+
+            fetch(`${apiBaseUrl}/cleanup`, { method: "DELETE", keepalive: true });
+        });
     </script>
 </body>
 </html>
